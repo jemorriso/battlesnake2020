@@ -40,7 +40,7 @@ function handleMove({ body: gameState }, response) {
 
   while (!strategy.avoidWalls(gameState.board, gameState.you, move)) {
     console.log(`${move} rejected`);
-    move = possibleMoves[move];
+    move = possibleMoves[Math.floor(Math.random() * possibleMoves.length)];
   }
 
   console.log('final MOVE: ' + move);
