@@ -47,7 +47,7 @@ function handleMove({ body: gameState }, response) {
       console.log(`attemptedMoves: ${attemptedMoves}`);
       attemptedMoves.push(move);
     }
-    if (attemptedMoves.length == 3) {
+    if (attemptedMoves.length == 4) {
       console.log('SNAKE TRAPPED!');
       break;
     }
