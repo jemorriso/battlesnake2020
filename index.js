@@ -1,5 +1,6 @@
 const bodyParser = require('body-parser');
 const express = require('express');
+const strategy = require('./strategy');
 
 const PORT = process.env.PORT || 3000;
 
@@ -34,7 +35,7 @@ function handleStart(request, response) {
 }
 
 function handleMove(request, response) {
-  var gameData = request.body;
+  var gameState = request.body;
 
   var possibleMoves = ['up', 'down', 'left', 'right'];
   var move = possibleMoves[Math.floor(Math.random() * possibleMoves.length)];
@@ -44,13 +45,13 @@ function handleMove(request, response) {
 
   console.log(head);
 
-  while (!strategy.avoid_walls(game_state, head)) {
-    var snake_move = possible_moves[choice];
-  }
+  // while (!strategy.avoid_walls(gameState, head, move)) {
+  //   move = possibleMoves[move];
+  // }
 
-  console.log('MOVE: ' + snake_move);
+  console.log('MOVE: ' + move);
   response.status(200).send({
-    move: snake_move,
+    move,
   });
 }
 
