@@ -42,11 +42,22 @@ function avoidSelf({ body }, nextHead) {
   return !body.some((el) => nextHead.x == el.x && nextHead.y == el.y);
 }
 
+function avoidSnakes({ snakes }, nextHead) {
+  for (snake of snakes) {
+    const { body } = snake;
+    if (body.some((el) => nextHead.x == el.x && nextHead.y == el.y)) {
+      return false;
+    }
+  }
+  return true;
+}
+
 function validateMove(gameState, move) {
   const { head } = gameState.you;
   const nextHead = getNextHead(head, move);
   return (
-    avoidWalls(gameState.board, nextHead) && avoidSelf(gameState.you, nextHead)
+    avoidWalls(gameState.board, nextHead) &&
+    avoidSnakes(gameState.board, nextHead)
   );
 }
 
