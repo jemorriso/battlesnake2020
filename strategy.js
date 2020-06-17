@@ -33,6 +33,8 @@ function avoidWalls({ height, width }, nextHead) {
 function avoidSelf({ body }, nextHead) {
   // TODO: check for food / tail
   // TODO: check for tail exit square
+  console.log(`body: ${body}`);
+  console.log(`next head in body: ${body.includes(nextHead)}`);
   return !body.includes(nextHead);
 }
 
