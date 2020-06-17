@@ -39,8 +39,16 @@ function handleMove({ body: gameState }, response) {
   var possibleMoves = ['up', 'down', 'left', 'right'];
   var move = possibleMoves[Math.floor(Math.random() * possibleMoves.length)];
 
+  const attemptedMoves = [];
   while (!strategy.validateMove(gameState, move)) {
     console.log(`${move} rejected`);
+
+    if (!attemptedMoves.includes(move)) attemptedMoves.push(move);
+
+    if (attemptedMoves.length == 3) {
+      console.log('SNAKE TRAPPED!');
+      break;
+    }
     move = possibleMoves[Math.floor(Math.random() * possibleMoves.length)];
   }
 

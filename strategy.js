@@ -38,6 +38,7 @@ function avoidSelf({ body }, nextHead) {
       (el) => nextHead.x == el.x && nextHead.y == el.y
     )}`
   );
+  // use array.some instead of array.includes because includes just compares the reference and always returns false
   return !body.some((el) => nextHead.x == el.x && nextHead.y == el.y);
 }
 
