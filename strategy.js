@@ -21,8 +21,7 @@ function getNextHead(currHead, move) {
   return nextHead;
 }
 
-function avoidWalls({ height, width }, { head }, move) {
-  const nextHead = getNextHead(head, move);
+function avoidWalls({ height, width }, nextHead) {
   return (
     nextHead.x >= 0 &&
     nextHead.x < width &&
@@ -31,4 +30,18 @@ function avoidWalls({ height, width }, { head }, move) {
   );
 }
 
-module.exports = { avoidWalls };
+function avoidSelf({ body }, nextHead) {
+  // TODO: check for food / tail
+  // TODO: check for tail exit square
+  return !body.includes(nextHead);
+}
+
+function validateMove(gameState, move) {
+  const { head } = gameState.you;
+  const nextHead = getNextHead(head, move);
+  return (
+    avoidWalls(gameState.board, nextHead) && avoidSelf(gameState.you, nextHead)
+  );
+}
+
+module.exports = { validateMove };
