@@ -33,9 +33,12 @@ function avoidWalls({ height, width }, nextHead) {
 function avoidSelf({ body }, nextHead) {
   // TODO: check for food / tail
   // TODO: check for tail exit square
-  console.log(`body: ${body}`);
-  console.log(`next head in body: ${body.includes(nextHead)}`);
-  return !body.includes(nextHead);
+  console.log(
+    `next head in body: ${body.some(
+      (el) => nextHead.x == el.x && nextHead.y == el.y
+    )}`
+  );
+  return !body.some((el) => nextHead.x == el.x && nextHead.y == el.y);
 }
 
 function validateMove(gameState, move) {
