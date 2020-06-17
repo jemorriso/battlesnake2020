@@ -2,13 +2,17 @@ const util = require('util');
 
 function getNextHead(currHead, move) {
   let nextHead = { ...currHead };
+  // if miss 'break' statement, script runs cases after, regardless of if criterion is met :'(
   switch (move) {
     case 'up':
       nextHead.y++;
+      break;
     case 'down':
       nextHead.y--;
+      break;
     case 'left':
       nextHead.x--;
+      break;
     case 'right':
       nextHead.x++;
   }

@@ -36,7 +36,6 @@ function handleStart(request, response) {
 }
 
 function handleMove({ body: gameState }, response) {
-  console.log(util.inspect(gameState));
   var possibleMoves = ['up', 'down', 'left', 'right'];
   var move = possibleMoves[Math.floor(Math.random() * possibleMoves.length)];
 
