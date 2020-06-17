@@ -34,22 +34,16 @@ function handleStart(request, response) {
   response.status(200).send('ok');
 }
 
-function handleMove(request, response) {
-  var gameState = request.body;
-
+function handleMove({ body: gameState }, response) {
   var possibleMoves = ['up', 'down', 'left', 'right'];
   var move = possibleMoves[Math.floor(Math.random() * possibleMoves.length)];
 
-  head = request.body.you.body[0];
-  console.log(request.body.you.body);
+  while (!strategy.avoidWalls(gameState.board, gameState.you, move)) {
+    console.log(`${move} rejected`);
+    move = possibleMoves[move];
+  }
 
-  console.log(head);
-
-  // while (!strategy.avoid_walls(gameState, head, move)) {
-  //   move = possibleMoves[move];
-  // }
-
-  console.log('MOVE: ' + move);
+  console.log('final MOVE: ' + move);
   response.status(200).send({
     move,
   });

@@ -1,19 +1,28 @@
-function next_head(curr_head, move) {
+function getNextHead(currHead, move) {
+  let nextHead = { ...currHead };
   switch (move) {
     case 'up':
-      return;
+      nextHead.y++;
     case 'down':
-      return;
+      nextHead.y--;
     case 'left':
-      return;
+      nextHead.x--;
     case 'right':
-      return;
+      nextHead.x++;
   }
+  console.log(`move: ${move}`);
+  console.log(`nextHead: ${nextHead}`);
+  return nextHead;
 }
 
-function avoid_walls({ height, width }, head, move) {
-  next_head(head, move);
-  return true;
+function avoidWalls({ height, width }, { head }, move) {
+  const nextHead = getNextHead(head, move);
+  return (
+    nextHead.x >= 0 &&
+    nextHead.x < width &&
+    nextHead.y >= 0 &&
+    nextHead.y < height
+  );
 }
 
-module.exports = { avoid_walls };
+module.exports = { avoidWalls };
