@@ -1,3 +1,5 @@
+const util = require('util');
+
 function getNextHead(currHead, move) {
   let nextHead = { ...currHead };
   switch (move) {
@@ -11,7 +13,7 @@ function getNextHead(currHead, move) {
       nextHead.x++;
   }
   console.log(`move: ${move}`);
-  console.log(`nextHead: ${nextHead}`);
+  console.log(`nextHead: ${util.inspect(nextHead)}`);
   return nextHead;
 }
 
