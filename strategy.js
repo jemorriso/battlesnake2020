@@ -33,40 +33,39 @@ function getTurnStrategy(
   }
 
   // if not in corner, go to nearest corner
-  if (!isInCorner(body, corners)) {
-    let targetCorner = getNearestCorner(head, corners);
+  // if (!isInCorner(body, corners)) {
+  let targetCorner = getNearestCorner(head, corners);
 
-    return function goToCorner(moves) {
-      currDistance = manhattanDistance(targetCorner, head);
-      // any move is either 1 closer, or 1 further away
-      best = moves.findIndex(
-        (move) =>
-          manhattanDistance(targetCorner, getNextHead(head, move)) <
-          currDistance
-      );
-      if (best !== -1) {
-        return moves[best];
-      } else {
-        // fails if there are no safe moves
-        try {
-          // no safe moves get closer to target corner, so just pick one of the remaining moves
-          return moves[0];
-        } catch (e) {
-          console.log('Snake is trapped!');
-        }
+  return function goToCorner(moves) {
+    currDistance = manhattanDistance(targetCorner, head);
+    // any move is either 1 closer, or 1 further away
+    best = moves.findIndex(
+      (move) =>
+        manhattanDistance(targetCorner, getNextHead(head, move)) < currDistance
+    );
+    if (best !== -1) {
+      return moves[best];
+    } else {
+      // fails if there are no safe moves
+      try {
+        // no safe moves get closer to target corner, so just pick one of the remaining moves
+        return moves[0];
+      } catch (e) {
+        console.log('Snake is trapped!');
       }
-    };
-  }
-
-  // if in a corner, move randomly
-  return function random(moves) {
-    // fails if there are no safe moves
-    try {
-      return moves[Math.floor(Math.random() * moves.length)];
-    } catch (e) {
-      console.log('Snake is trapped!');
     }
   };
+  // }
+
+  // // if in a corner, move randomly
+  // return function random(moves) {
+  //   // fails if there are no safe moves
+  //   try {
+  //     return moves[Math.floor(Math.random() * moves.length)];
+  //   } catch (e) {
+  //     console.log('Snake is trapped!');
+  //   }
+  // };
 }
 
 // if any part of my snake's body is touching a corner, return true
