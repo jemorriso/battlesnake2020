@@ -1,9 +1,32 @@
 const util = require('util');
 
+const manhattanDistance = ({ x: cx, y: cy }, { x: hx, y: hy }) =>
+  Math.abs(cx - hx) + Math.abs(cy - hy);
+
 function getTurnStrategy({ you: { body, head }, board }, { corners }) {
   // if not in corner, go to nearest corner
   if (!isInCorner(body, corners)) {
     let targetCorner = getNearestCorner(head, corners);
+
+    return function goToCorner(moves) {
+      currDistance = manhattanDistance(targetCorner, head);
+      // any move is either 1 closer, or 1 further away
+      if (
+        !moves.find(
+          (move) =>
+            manhattanDistance(targetCorner, getNextHead(head, move)) <
+            currDistance
+        )
+      ) {
+        // fails if there are no safe moves
+        try {
+          // no safe moves get closer to target corner
+          return moves[0];
+        } catch (e) {
+          console.log('Snake is trapped!');
+        }
+      }
+    };
   }
 
   return function random(moves) {
@@ -33,9 +56,6 @@ function isInCorner(body, corners) {
 function getNearestCorner(head, corners) {
   // return function to freeze values
   const minManhattan = (head) => {
-    const manhattanDistance = ({ x: cx, y: cy }, { x: hx, y: hy }) =>
-      Math.abs(cx - hx) + Math.abs(cy - hy);
-
     return (minCorner, currCorner) => {
       minDistance = manhattanDistance(minCorner, head);
       currDistance = manhattanDistance(currCorner, head);
