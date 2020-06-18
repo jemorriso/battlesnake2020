@@ -3,7 +3,35 @@ const util = require('util');
 const manhattanDistance = ({ x: cx, y: cy }, { x: hx, y: hy }) =>
   Math.abs(cx - hx) + Math.abs(cy - hy);
 
-function getTurnStrategy({ you: { body, head }, board }, { corners }) {
+function getTurnStrategy(
+  { you: { body, head, health }, board: { food } },
+  { corners }
+) {
+  // if hungry, go eat
+  if (health < 30) {
+    let targetFood = getNearestFood(head, food);
+
+    return function goEat(moves) {
+      currDistance = manhattanDistance(targetFood, head);
+      // any move is either 1 closer, or 1 further away
+      best = moves.findIndex(
+        (move) =>
+          manhattanDistance(targetFood, getNextHead(head, move)) < currDistance
+      );
+      if (best !== -1) {
+        return moves[best];
+      } else {
+        // fails if there are no safe moves
+        try {
+          // no safe moves get closer to target corner, so just pick one of the remaining moves
+          return moves[0];
+        } catch (e) {
+          console.log('Snake is trapped!');
+        }
+      }
+    };
+  }
+
   // if not in corner, go to nearest corner
   if (!isInCorner(body, corners)) {
     let targetCorner = getNearestCorner(head, corners);
@@ -30,6 +58,7 @@ function getTurnStrategy({ you: { body, head }, board }, { corners }) {
     };
   }
 
+  // if in a corner, move randomly
   return function random(moves) {
     // fails if there are no safe moves
     try {
@@ -72,6 +101,26 @@ function getNearestCorner(head, corners) {
   const nearestCorner = corners.reduce(minManhattan(head));
   console.log(`nearest corner: ${nearestCorner}`);
   return nearestCorner;
+}
+
+function getNearestFood(head, food) {
+  // return function to freeze values
+  const minManhattan = (head) => {
+    return (minCorner, currCorner) => {
+      minDistance = manhattanDistance(minCorner, head);
+      currDistance = manhattanDistance(currCorner, head);
+
+      if (currDistance < minDistance) {
+        return currCorner;
+      } else {
+        return minCorner;
+      }
+    };
+  };
+
+  const nearestFood = food.reduce(minManhattan(head));
+  console.log(`nearest food: ${nearestFood}`);
+  return nearestFood;
 }
 
 function getNextHead(currHead, move) {
