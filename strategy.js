@@ -1,9 +1,10 @@
 const util = require('util');
 
-function getTurnStrategy() {
+function getTurnStrategy({ you: { body }, board }) {
   // if not in corner, go to nearest corner
-  // if (!isInCorner()) {
-
+  isInCorner();
+  // if (!isInCorner(body, board)) {
+  //   let targetCorner = getNearestCorner();
   // }
 
   return function random(moves) {
@@ -15,7 +16,27 @@ function getTurnStrategy() {
   };
 }
 
-function isInCorner() {}
+// if any part of my snake's body is touching a corner, return true
+function isInCorner(body, { height, width }) {
+  const corners = [
+    { x: 0, y: 0 },
+    { x: 0, y: height - 1 },
+    { x: width - 1, y: height - 1 },
+    { x: width - 1, y: 0 },
+  ];
+
+  for (let el of body) {
+    for (let corner of corners) {
+      if (corner.x == el.x && corner.y == el.y) {
+        console.log('snake is in a corner');
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
+function getNearestCorner() {}
 
 function getNextHead(currHead, move) {
   let nextHead = { ...currHead };
