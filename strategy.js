@@ -1,33 +1,27 @@
 const util = require('util');
 
-function getTurnStrategy({ you: { body }, board }) {
+function getTurnStrategy({ you: { body }, board, head }, { corners }) {
   // if not in corner, go to nearest corner
-  isInCorner(body, board);
-  // if (!isInCorner(body, board)) {
-  //   let targetCorner = getNearestCorner();
-  // }
+  if (!isInCorner(body, board, corners)) {
+    let targetCorner = getNearestCorner(head);
+  }
 
   return function random(moves) {
+    // fails if there are no safe moves
     try {
       return moves[Math.floor(Math.random() * moves.length)];
-    } catch {
+    } catch (e) {
       console.log('Snake is trapped!');
     }
   };
 }
 
 // if any part of my snake's body is touching a corner, return true
-function isInCorner(body, { height, width }) {
-  const corners = [
-    { x: 0, y: 0 },
-    { x: 0, y: height - 1 },
-    { x: width - 1, y: height - 1 },
-    { x: width - 1, y: 0 },
-  ];
-
+function isInCorner(body, corners) {
   for (let el of body) {
     for (let corner of corners) {
       if (corner.x == el.x && corner.y == el.y) {
+        console.log(`body: ${util.inspect(body)}`);
         console.log('snake is in a corner');
         return true;
       }
@@ -36,7 +30,24 @@ function isInCorner(body, { height, width }) {
   return false;
 }
 
-function getNearestCorner() {}
+function getNearestCorner(head, corners) {
+  // return function to freeze values
+  const minManhattan = (head) => {
+    const manhattanDistance = ({ cx, cy }, { hx, hy }) =>
+      Math.abs(cx - hx) + Math.abs(cy - hy);
+
+    return (minCorner, currCorner) => {
+      Math.min(
+        manhattanDistance(minCorner, head),
+        manhattanDistance(currCorner, head)
+      );
+    };
+  };
+
+  const nearestCorner = corners.reduce(minManhattan(head), []);
+  console.log(`nearest corner: ${nearestCorner}`);
+  return nearestCorner;
+}
 
 function getNextHead(currHead, move) {
   let nextHead = { ...currHead };
