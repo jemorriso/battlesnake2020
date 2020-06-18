@@ -122,8 +122,15 @@ function getNearestFood(head, food) {
   return nearestFood;
 }
 
+const invertGetNextHead = (currHead, nextHead) => {
+  const vectorDiff = (n, c) => ({ x: n.x - c.x, y: n.y - c.y });
+  const v = vectorDiff(nextHead, currHead);
+
+  return v.x == 1 ? 'right' : v.y == -1 ? 'down' : v.x == -1 ? 'left' : 'up';
+};
+
 function getNextHead(currHead, move) {
-  let nextHead = { ...currHead };
+  const nextHead = { ...currHead };
   // if miss 'break' statement, script runs cases after, regardless of if criterion is met :'(
   switch (move) {
     case 'up':
@@ -164,24 +171,59 @@ function avoidSelf({ body }, nextHead) {
   return !body.some((el) => nextHead.x == el.x && nextHead.y == el.y);
 }
 
-function avoidSnakes({ snakes }, nextHead) {
+function avoidSnakes(gameState, nextHead) {
+  const {
+    board: { snakes },
+  } = gameState;
   // TODO: need to watch out for other snake heads, and remember that I can go into tail position
   for (snake of snakes) {
     const { body } = snake;
-    if (body.some((el) => nextHead.x == el.x && nextHead.y == el.y)) {
+    // can move into tail, unless snake is about to eat
+    // TODO: handle about to eat case
+    if (
+      body.slice(0, -1).some((el) => nextHead.x == el.x && nextHead.y == el.y)
+    ) {
       return false;
     }
   }
   return true;
 }
 
-function validateMove(gameState, move) {
-  const { head } = gameState.you;
-  const nextHead = getNextHead(head, move);
-  return (
-    avoidWalls(gameState.board, nextHead) &&
-    avoidSnakes(gameState.board, nextHead)
-  );
+function getPotentialSnakeHeads(gameState) {
+  const {
+    board: { snakes },
+    you: { id },
+  } = gameState;
+  const potentialHeads = [];
+
+  for (snake of snakes) {
+    const { id: snakeID } = snake;
+    if (id !== snakeID) {
+      const { head } = snake;
+      const safeMoves = getSafeMoves(gameState, snake);
+      const safeHeads = safeMoves.map((move) => getNextHead(head, move));
+      potentialHeads.push(safeHeads);
+    }
+  }
+  return potentialHeads;
 }
 
-module.exports = { validateMove, getTurnStrategy };
+// get safe moves for a given snake
+function getSafeMoves(gameState, snake) {
+  const possibleMoves = ['up', 'down', 'left', 'right'];
+  return possibleMoves.filter((move) => validateMove(gameState, snake, move));
+}
+
+function validateMove(gameState, { head }, move) {
+  const { board } = gameState;
+  const nextHead = getNextHead(head, move);
+  return avoidWalls(board, nextHead) && avoidSnakes(gameState, nextHead);
+}
+
+module.exports = {
+  validateMove,
+  getTurnStrategy,
+  getPotentialSnakeHeads,
+  getNextHead,
+  invertGetNextHead,
+};

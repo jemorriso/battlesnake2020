@@ -43,13 +43,34 @@ function handleStart({ body: gameState, app: { locals } }, res) {
 }
 
 function handleMove({ body: gameState, app: { locals } }, res) {
+  // note that I need to destructure 'you' on its own also here
+  const {
+    you: { head },
+    you,
+  } = gameState;
   const possibleMoves = ['up', 'down', 'left', 'right'];
   const safeMoves = possibleMoves.filter((move) =>
-    strategy.validateMove(gameState, move)
+    strategy.validateMove(gameState, you, move)
+  );
+  const safeHeads = safeMoves.map((move) => strategy.getNextHead(head, move));
+  const potentialHeads = strategy.getPotentialSnakeHeads(gameState);
+
+  // filter out safeHeads in potentialHeads, then turn them back into really safe moves
+  // Only use safe moves if really safe moves is empty.
+  const reallySafeHeads = safeHeads.filter((nextHead) => {
+    // filter out any 'safe' heads that are actually risky
+    return !potentialHeads.some(
+      (potHead) => potHead.x == nextHead.x && potHead.y == nextHead.y
+    );
+  });
+  const reallySafeMoves = reallySafeHeads.map((nextHead) =>
+    strategy.invertGetNextHead(head, nextHead)
   );
 
   const turnStrategy = strategy.getTurnStrategy(gameState, locals);
-  const move = turnStrategy(safeMoves);
+  const move = turnStrategy(
+    reallySafeMoves.length > 0 ? reallySafeMoves : safeMoves
+  );
 
   // let move = possibleMoves[Math.floor(Math.random() * possibleMoves.length)];
 
