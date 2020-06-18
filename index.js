@@ -41,7 +41,7 @@ function handleMove({ body: gameState }, response) {
     strategy.validateMove(gameState, move)
   );
 
-  const turnStrategy = strategy.getTurnStrategy();
+  const turnStrategy = strategy.getTurnStrategy(gameState);
   const move = turnStrategy(safeMoves);
 
   // let move = possibleMoves[Math.floor(Math.random() * possibleMoves.length)];
