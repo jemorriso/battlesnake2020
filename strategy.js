@@ -1,5 +1,22 @@
 const util = require('util');
 
+function getTurnStrategy() {
+  // if not in corner, go to nearest corner
+  // if (!isInCorner()) {
+
+  // }
+
+  return function random(moves) {
+    try {
+      return moves[Math.floor(Math.random() * moves.length)];
+    } catch {
+      console.log('Snake is trapped!');
+    }
+  };
+}
+
+function isInCorner() {}
+
 function getNextHead(currHead, move) {
   let nextHead = { ...currHead };
   // if miss 'break' statement, script runs cases after, regardless of if criterion is met :'(
@@ -43,6 +60,7 @@ function avoidSelf({ body }, nextHead) {
 }
 
 function avoidSnakes({ snakes }, nextHead) {
+  // TODO: need to watch out for other snake heads, and remember that I can go into tail position
   for (snake of snakes) {
     const { body } = snake;
     if (body.some((el) => nextHead.x == el.x && nextHead.y == el.y)) {
@@ -61,4 +79,4 @@ function validateMove(gameState, move) {
   );
 }
 
-module.exports = { validateMove };
+module.exports = { validateMove, getTurnStrategy };

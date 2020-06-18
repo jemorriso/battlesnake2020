@@ -36,23 +36,30 @@ function handleStart(request, response) {
 }
 
 function handleMove({ body: gameState }, response) {
-  let possibleMoves = ['up', 'down', 'left', 'right'];
-  let move = possibleMoves[Math.floor(Math.random() * possibleMoves.length)];
+  const possibleMoves = ['up', 'down', 'left', 'right'];
+  const safeMoves = possibleMoves.filter((move) =>
+    strategy.validateMove(gameState, move)
+  );
 
-  const attemptedMoves = [];
-  while (!strategy.validateMove(gameState, move)) {
-    console.log(`${move} rejected`);
+  const turnStrategy = strategy.getTurnStrategy();
+  const move = turnStrategy(safeMoves);
 
-    if (!attemptedMoves.includes(move)) {
-      console.log(`attemptedMoves: ${attemptedMoves}`);
-      attemptedMoves.push(move);
-    }
-    if (attemptedMoves.length == 4) {
-      console.log('SNAKE TRAPPED!');
-      break;
-    }
-    move = possibleMoves[Math.floor(Math.random() * possibleMoves.length)];
-  }
+  // let move = possibleMoves[Math.floor(Math.random() * possibleMoves.length)];
+
+  // const attemptedMoves = [];
+  // while (!strategy.validateMove(gameState, move)) {
+  //   console.log(`${move} rejected`);
+
+  //   if (!attemptedMoves.includes(move)) {
+  //     console.log(`attemptedMoves: ${attemptedMoves}`);
+  //     attemptedMoves.push(move);
+  //   }
+  //   if (attemptedMoves.length == 4) {
+  //     console.log('SNAKE TRAPPED!');
+  //     break;
+  //   }
+  //   move = possibleMoves[Math.floor(Math.random() * possibleMoves.length)];
+  // }
 
   console.log('final MOVE: ' + move);
   response.status(200).send({
