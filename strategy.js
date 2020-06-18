@@ -2,7 +2,7 @@ const util = require('util');
 
 function getTurnStrategy({ you: { body }, board }) {
   // if not in corner, go to nearest corner
-  isInCorner();
+  isInCorner(body, board);
   // if (!isInCorner(body, board)) {
   //   let targetCorner = getNearestCorner();
   // }
