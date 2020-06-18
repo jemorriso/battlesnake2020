@@ -28,10 +28,10 @@ function handleIndex(req, res) {
   res.status(200).json(battlesnakeInfo);
 }
 
-function handleStart({ body: gameState }, res) {
+function handleStart({ body: gameState, app: { locals } }, res) {
   const { height, width } = gameState.board;
 
-  req.app.locals.corners = [
+  locals.corners = [
     { x: 0, y: 0 },
     { x: 0, y: height - 1 },
     { x: width - 1, y: height - 1 },

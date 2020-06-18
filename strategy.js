@@ -1,9 +1,9 @@
 const util = require('util');
 
-function getTurnStrategy({ you: { body }, board, head }, { corners }) {
+function getTurnStrategy({ you: { body, head }, board }, { corners }) {
   // if not in corner, go to nearest corner
-  if (!isInCorner(body, board, corners)) {
-    let targetCorner = getNearestCorner(head);
+  if (!isInCorner(body, corners)) {
+    let targetCorner = getNearestCorner(head, corners);
   }
 
   return function random(moves) {
@@ -33,18 +33,22 @@ function isInCorner(body, corners) {
 function getNearestCorner(head, corners) {
   // return function to freeze values
   const minManhattan = (head) => {
-    const manhattanDistance = ({ cx, cy }, { hx, hy }) =>
+    const manhattanDistance = ({ x: cx, y: cy }, { x: hx, y: hy }) =>
       Math.abs(cx - hx) + Math.abs(cy - hy);
 
     return (minCorner, currCorner) => {
-      Math.min(
-        manhattanDistance(minCorner, head),
-        manhattanDistance(currCorner, head)
-      );
+      minDistance = manhattanDistance(minCorner, head);
+      currDistance = manhattanDistance(currCorner, head);
+
+      if (currDistance < minDistance) {
+        return currCorner;
+      } else {
+        return minCorner;
+      }
     };
   };
 
-  const nearestCorner = corners.reduce(minManhattan(head), []);
+  const nearestCorner = corners.reduce(minManhattan(head));
   console.log(`nearest corner: ${nearestCorner}`);
   return nearestCorner;
 }
