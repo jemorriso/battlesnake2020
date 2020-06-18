@@ -11,16 +11,17 @@ function getTurnStrategy({ you: { body, head }, board }, { corners }) {
     return function goToCorner(moves) {
       currDistance = manhattanDistance(targetCorner, head);
       // any move is either 1 closer, or 1 further away
-      if (
-        !moves.find(
-          (move) =>
-            manhattanDistance(targetCorner, getNextHead(head, move)) <
-            currDistance
-        )
-      ) {
+      best = moves.findIndex(
+        (move) =>
+          manhattanDistance(targetCorner, getNextHead(head, move)) <
+          currDistance
+      );
+      if (best !== -1) {
+        return moves[best];
+      } else {
         // fails if there are no safe moves
         try {
-          // no safe moves get closer to target corner
+          // no safe moves get closer to target corner, so just pick one of the remaining moves
           return moves[0];
         } catch (e) {
           console.log('Snake is trapped!');
