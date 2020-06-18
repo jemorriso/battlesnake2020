@@ -53,7 +53,8 @@ function handleMove({ body: gameState, app: { locals } }, res) {
     strategy.validateMove(gameState, you, move)
   );
   const safeHeads = safeMoves.map((move) => strategy.getNextHead(head, move));
-  const potentialHeads = strategy.getPotentialSnakeHeads(gameState);
+  // flatten into array of potential heads of all snakes
+  const potentialHeads = strategy.getPotentialSnakeHeads(gameState).flat();
 
   // filter out safeHeads in potentialHeads, then turn them back into really safe moves
   // Only use safe moves if really safe moves is empty.
