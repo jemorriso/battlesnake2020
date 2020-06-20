@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/BattlesnakeOfficial/starter-snake-node#readme",
   "dependencies": {
-    "express": "^4.17.1"
+    "express": "^4.17.1",
+    "tinyqueue": "^2.0.3"
   }
 }

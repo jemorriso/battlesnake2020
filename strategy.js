@@ -1,4 +1,21 @@
 const util = require('util');
+const TinyQueue = require('tinyqueue');
+const { throws } = require('assert');
+
+class Node {
+  constructor(parent, position, g, h) {
+    this.parent = parent;
+    this.position = position;
+
+    this.g = g;
+    this.h = h;
+    this.f = g + h;
+  }
+
+  equals({ position: { x, y } }) {
+    return this.position.x === x && this.position.y === y;
+  }
+}
 
 const manhattanDistance = ({ x: cx, y: cy }, { x: hx, y: hy }) =>
   Math.abs(cx - hx) + Math.abs(cy - hy);
@@ -35,10 +52,112 @@ const scoreMove = (move, check1, check2) => {
     : 4;
 };
 
-function getTurnStrategy(
-  { you: { body, head, health }, board: { food } },
-  { corners }
-) {
+// const aStarSearch = (gameState, h, startPos, endPos) => {
+//     const {
+//       you: { head },
+//       board: { snakes, height, width },
+//     } = gameState;
+
+//   }
+
+const aStarSearch = (gameState, h, startPos, endPos) => {
+  const {
+    you: { head, body },
+    board: { snakes, height, width },
+  } = gameState;
+
+  // save snake body to restore after aStarSearch
+  // TODO: fix this so I'm not mutating the game state
+  // yourBody = { body }
+
+  // g = manhattanDistance;
+
+  // let obstacles = [];
+  // for ({ body } of snakes) {
+  //   obstacles.push(body);
+  // }
+  // obstacles = obstacles.flat();
+
+  const open = [];
+  const closed = [];
+
+  // goal node
+  const end = new Node(null, endPos, 0, 0);
+
+  // push start node onto open list
+  open.push(new Node(null, startPos, 0, 0));
+
+  while (open.length > 0) {
+    // need to remember to keep array sorted in reverse order
+    open.sort((a, b) => {
+      // ** reverse order **
+      if (a.f < b.f) return 1;
+      if (a.f > b.f) return -1;
+      return 0;
+    });
+    let curr = open.pop();
+    closed.push(curr);
+
+    // found goal node, return path from start to end
+    if (curr.equals(end)) {
+      const path = [];
+      while (curr !== null) {
+        path.push(curr.position);
+        curr = curr.parent;
+      }
+      // don't include start node
+      path.pop();
+      return path.reverse();
+    }
+    // test current node's neighbours for addition to open list
+    for (let move of ['up', 'down', 'left', 'right']) {
+      // TODO: consolidate validateMoves
+      // test that the move doesn't go out of bounds or run into obstacles (other snakes)
+      if (validateMove2(gameState, curr.position, move)) {
+        // create new Node and test if in open and closed lists already
+        const neighbourPos = getNextHead(curr.position, move);
+        const neighbour = new Node(
+          curr,
+          neighbourPos,
+          curr.g + 1,
+          h(neighbourPos, endPos)
+        );
+
+        // if in closed, already processed
+        if (closed.some((el) => el.equals(neighbour))) {
+          continue;
+        }
+        // if in open, but has smaller g value (shorter path from start), continue
+        // TODO: this is slow
+        // const sorted = [];
+        // while (open.length) {
+        //   sorted.push(open.pop());
+        // }
+        const openNode = open.find((el) => el.equals(neighbour));
+
+        if (openNode !== undefined) {
+          // already have a better path to the neighbour
+          if (openNode.g < neighbour.g) {
+            continue;
+          }
+          // found a better path, so remove the old one
+          else {
+            open.filter((el) => el.equals(openNode));
+          }
+        }
+        // add the neighbour
+        open.push(neighbour);
+      }
+    }
+  }
+};
+
+function getTurnStrategy(gameState, { corners }) {
+  const {
+    you: { body, head, health },
+    board: { food },
+  } = gameState;
+
   // if hungry, go eat
   if (health < 30) {
     let targetFood = getNearestFood(head, food);
@@ -63,7 +182,20 @@ function getTurnStrategy(
       }
     };
   } else {
-    let targetCorner = getNearestCorner(head, corners);
+    const targetCornerIndex = corners
+      .map(
+        (corner) =>
+          aStarSearch(gameState, manhattanDistance, head, corner).length
+      )
+      .reduce(
+        (bestIndex, curr, i, arr) => (curr < arr[bestIndex] ? i : bestIndex),
+        0
+      );
+
+    // const path = aStarSearch(gameState, manhattanDistance, head, corners[2]);
+    // let targetCorner = getNearestCorner(head, corners);
+
+    let targetCorner = corners[targetCornerIndex];
 
     return function goToCorner(moves) {
       // there are no possible moves for the snake to make.
@@ -285,6 +417,12 @@ function getSafeMoves(gameState, snake) {
 function validateMove(gameState, { head }, move) {
   const { board } = gameState;
   const nextHead = getNextHead(head, move);
+  return avoidWalls(board, nextHead) && avoidSnakes(gameState, nextHead);
+}
+
+function validateMove2(gameState, curr, move) {
+  const { board } = gameState;
+  const nextHead = getNextHead(curr, move);
   return avoidWalls(board, nextHead) && avoidSnakes(gameState, nextHead);
 }
 
