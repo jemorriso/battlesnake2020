@@ -69,6 +69,8 @@ function handleMove({ body: gameState, app: { locals } }, res) {
   );
 
   const turnStrategy = strategy.getTurnStrategy(gameState, locals);
+
+  // Never choose a safe move over a really safe move
   const move = turnStrategy(
     reallySafeMoves.length > 0 ? reallySafeMoves : safeMoves
   );
