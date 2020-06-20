@@ -88,6 +88,7 @@ const aStarSearch = (gameState, h, startPos, endPos) => {
   open.push(new Node(null, startPos, 0, 0));
 
   while (open.length > 0) {
+    console.log('a-star open array length: ' + open.length);
     // need to remember to keep array sorted in reverse order
     open.sort((a, b) => {
       // ** reverse order **
@@ -106,7 +107,7 @@ const aStarSearch = (gameState, h, startPos, endPos) => {
         curr = curr.parent;
       }
       // don't include start node
-      path.pop();
+      // path.pop();
       return path.reverse();
     }
     // test current node's neighbours for addition to open list
