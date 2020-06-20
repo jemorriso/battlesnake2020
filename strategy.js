@@ -79,12 +79,11 @@ function getTurnStrategy(
         moveCloserToTail(head, move, body.slice(-1).pop());
 
       // any move is either 1 closer, or 1 further away - good moves are closer to corner
-      // const goodMoves = moves.filter(
-      //   (move) =>
-      //     manhattanDistance(targetCorner, getNextHead(head, move)) <
-      //     currDistance
-      // );
-      const goodMoves = moves;
+      const goodMoves = moves.filter(
+        (move) =>
+          manhattanDistance(targetCorner, getNextHead(head, move)) <
+          currDistance
+      );
       if (goodMoves.length > 0) {
         const bestMove = goodMoves.reduce((best, curr) => {
           if (
